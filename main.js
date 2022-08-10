@@ -1,174 +1,209 @@
-/* 함수 복습 */
+/* 생성자 함수(prototype) 
 
-/* 기명함수 - 선언 방법 function키워드와 함수의 이름.
-function sum(x, y) { // 매개변수
-  console.log(x)
-  // if (x < 2) { // 활용 가능
-  //   return // 키워드 없이 작성시 그냥 종료.  
-  // }
-  return x + y
-  console.log(x) // return으로 함수가 종료되면 키워드 뒤의 내용은 실행되지 않음.
+const heropy = {
+  // 속성과 메소드를 통틀어서 멤버(Member)라고 부름.
+  firstName: 'Heropy', // 속성
+  lastName: 'Park', // 속성
+  getFullName: function () { // 메소드 - 속성에 함수데이터가 할당되어있음.
+    return `${this.firstName} ${this.lastName}`
+    // return `${heropy.firstName}` 변수의 이름이 바뀔 수 있기 때문에 this(객체데이터가 다른 변수에 할당될 가능성)
+  }
 }
-*/
-/* 익명함수 - 함수 표현
-const sum = function (x, y) {
-  return x + y
-}*/
-/*
-// arguments 객체 사용
-// 매개변수를 지정하지 않아도 arguments 객체를 사용할 수 있게 되어있음.
-// 인수가 너무 많아 매개변수를 일일히 지정하기 힘들때 활용.
-// 자주 사용되는 함수는 아님.
-function sum() {
-  console.log(arguments)
-  return arguments[0] + arguments[1]
+console.log(heropy)
+console.log(heropy.getFullName())
+
+const amy = {
+  firstName: 'Amy',
+  lastName: 'Clarke',
+  getFullName: function () {
+    return `${this.firstName} ${this.lastName}`
+  }
+}
+console.log(amy)
+console.log(amy.getFullName())
+
+const neo = {
+  firstName: 'Neo',
+  lastName: 'Smith',
+  getFullName: function () {
+    return `${this.firstName} ${this.lastName}`
+  }
+}
+console.log(neo)
+console.log(neo.getFullName())
+
+// 객체 데이터와 함수는 메모리에 저장됨. 불필요한 중복 => Class 개념 필요.
+
+function User(first, last) { // 생성자 함수(new와 함께 사용되는)는 파스칼케이스.
+  this.firstName = first
+  this.lastName = last
+}
+// 똑같은 로직 부분을 통일해서 메모리를 효율적으로 관리
+User.prototype.getFullName = function () {
+  return `${this.firstName} ${this.lastName}`
 }
 
-console.log(sum(7, 3))
-*/
+// (생성자 함수의)인스턴스 : new 키워드를 통해 생성자 함수로 실행한 결과를 반환해서 할당된 변수
+const heropy = new User('Heropy', 'Park') // new ... => 생성자 함수(객체데이터 생성)
+const amy = new User('Amy', 'Clarke')
+const neo = new User('Neo', 'Smith')
 
-/*
-const a = sum(1, 3) // 인수
-const b = sum(4, 12)
-
-// 변수에 함수 실행의 내용을 담아서 사용하면 함수는 한번만 사용되며, 그 결과의 값만 가져와서 재활용 할 수 있는 구조
-// 함수의 결과가 반복적으로 사용될 때 좋은 방법.
-// console.log(a)
-// console.log(b)
-console.log(a + b)
-
-// 값은 같지만 함수가 한번 더 동작하기 때문에 여러번 실행하는 것이 효율적이지 않음.
-// 단일로만 사용되어 변수에 담지 않아도 될 때 사용하는 방법.
-// 함수의 결과가 단일로 사용될 때 결과가 사용되는 곳에서 호출한다.
-console.log(sum(1,3))
-console.log(sum(4,12))
-// console.log(sum(1, 3) + sum(4, 12))
+console.log(heropy)
+console.log(amy)
+console.log(neo)
+// 각 user.prototype.getFullName 참조
+console.log(heropy.getFullName())
+console.log(amy.getFullName())
+console.log(neo.getFullName())
 */
 
 
 
-/* 화살표 함수
+/* this 
 
-// 화살표 함수
-// () => {} vs function () {}
+// this
+// 일반(Normal) 함수는 호출 위치!에 따라 this 정의!
+// 화살표(Arrow) 함수는 자신이 선언된 함수 범위!에서 this 정의!
 
-const double = function (x) { // 익명의 함수를 할당해서 '함수 표현' 작성
-  return x * 2
+// 1.
+const heropy = {
+  name: 'Heropy',
+  normal: function () { // normal이 호출되는 위치에서 this 정의,
+    console.log(this.name)
+  },
+  arrow: () => {
+    console.log(this.name)
+  }
 }
-console.log('double: ', double(7))
+// 호출, 앞에 객체가 붙어있기 때문에 메소드.
+heropy.normal() // .으로 heropy에서 호출하므로, this는 heropy에서 this 정의.
+heropy.arrow() // this정의는 호출 위치랑 상관 없음.
 
-// const doubleArrow = (x) => {
-//   // console.log(123) // 이 문장이 있다면 축약형을 사용할 수 없음.
-//   return x * 2 // 리턴 키워드와 단순 실행문이 있기 때문에 축약형 사용 가능.
+const amy = {
+  name: 'Amy',
+  // heropy에 normal,arrow를 할당중. ()실행X 각 데이터를 할당.
+  normal: heropy.normal,
+  arrow: heropy.arrow
+}
+amy.normal() // amy객체를 연결하여 호출되었으므로 this 정의.
+amy.arrow()
+
+// 2. prototype
+function User(name) {
+  this.name = name
+}
+User.prototype.normal = function () {
+  console.log(this.name)
+}
+User.prototype.arrow = () => {
+  console.log(this.name)
+}
+
+const heropy = new User('Heropy')
+
+heropy.normal() // heropy에서 this 정의
+heropy.arrow() // arrow의 위치는 window 이므로 undefined
+
+// 3.
+const timer = {
+  name: '니가 이름이다 니가떠라',
+  timeout: function () {
+    // setTimeout(함수, 시간) 콜백함수가 더활용도 높음.
+    setTimeout(function () { // 일반함수, setTimeout의 내부로직으로 콜백이 들어감
+      console.log(this.name + ' ?????????') // ???????????
+      console.log('너왜뜨니???')
+    }, 2000)
+    setTimeout(() => { // 화살표함수, 자신이 선언된 함수 범위에서 정의, timeout는 timer을 가리킴. User안에서 찾자
+      console.log(this.name) // 이름잘뜸
+    }, 3000)
+  }
+}
+timer.timeout()
+*/
+
+
+
+/* ES6 Classes 
+
+// ES6 Classes
+
+// 일반함수 생략 가능
+const heropy = {
+  name: 'Heropy',
+  // normal: function () {
+  normal() { // 일반함수만 생략가능
+    console.log(this.name)
+  },
+  arrow: () => {
+    console.log(this.name)
+  }
+}
+
+heropy.normal()
+heropy.arrow()
+
+// class 문법
+
+// function User(first, last) {
+//   this.firstName = first
+//   this.lastName = last
 // }
-// const doubleArrow = (x) => x * 2 // 1. return 제거 축약형 사용
-// const doubleArrow = x => x * 2 // 2. 인자가 1개라면 ()제거 축약형 사용하여 실행문 반환, 문자숫자불린등 데이터들 출력가능
-// 3. 객체 데이터 축약형으로 반환하는 방법 ()로 감싸주어야함.
-const doubleArrow = x => ({name: 'Hi'})
-console.log('doubleArrow', doubleArrow(7))
-*/
-
-
-
-/* IIFE
-
-// 즉시실행함수
-// IIFE, Immediately-Invoked Function Expreesion
-
-const a = 7
-function double() {
-  console.log(a * 2)
-}
-double(); // 즉시 실행 함수가 실행되는 부분과 더블이 실행되는 부분을 명확하게 구분하지 못함. ; 붙여야함.
-// 한번 실행되고 더이상 쓰지 않는다면..
-(function () { // 익명 함수 
-  console.log(a * 2)
-})(); // ()(): 즉시 실행 함수 
-
-(function () { // 익명 함수 
-  console.log(a * 2)
-}()); // (()) : ()를 ( )에 넣어서 사용 가능.
-*/
-
-
-
-/* 호이스팅
-
-// 호이스팅(Hoisting)
-// 함수 선언부가 유효범위 최상단으로 끌어올려지는 현상
-
-const a = 7
-
-// double() // TypeError: double is not a function
-// const double = function () { // 익명함수 표현(선언이 아니기 때문에 호이스팅 불가능.)
-//   console.log(a * 2)
+// User.prototype.getFullName = function () {
+//   return `${this.firstName} ${this.lastName}`
 // }
-// double()
 
-// 함수 이름만 보고도 추측할 수 있기 때문에, 
-// 호출은 위에서, 로직은 아래서 확인.
-double() // 에러없음. 호이스팅 발생.
+class User {
+  constructor(first, last) { // ': function' 생략된 것
+    this.firstName = first
+    this.lastName = last
+  }
 
-function double() {
-  console.log(a * 2)
+  getFullName() { // prototype속성 사용하지 않아도 prototype로 만들어지는 메소드 정의.
+    return `${this.firstName} ${this.lastName}`
+  }
 }
+
+const heropy = new User('Heropy', 'Park')
+const amy = new User('Amy', 'Clarke')
+const neo = new User('Neo', 'Smith')
+
+console.log(heropy)
+console.log(amy.getFullName())
+console.log(neo.getFullName())
 */
 
 
 
-/* 타이머 함수 
+/* 상속(확장) */
 
-// 타이머 함수
-// setTimeout(함수, 시간): 일정 시간 후 함수 실행 (ms)
-// setInterval(함수, 시간): 시간 간격마다 함수 실행
-// clearTimeout(): 설정된 Timeout 함수를 종료
-// clearInterval(): 설정된 Interval 함수를 종료
-
-// setTimeout(function () { 축약
-const timer = setTimeout(() => {
-  console.log('Hi')
-}, 3000)
-
-const h1El = document.querySelector('h1')
-h1El.addEventListener('click', () => {
-  clearTimeout(timer)
-})
-
-const timerIn = setInterval(() => {
-  console.log('HiInterval')
-}, 3000)
-
-const h1ElI = document.querySelector('h1')
-h1ElI.addEventListener('click', () => {
-  clearInterval(timerIn)
-})
-*/
-
-
-
-/* 콜백
-
-// 콜백(Callback)
-// 함수의 인수로 사용되는 함수
-
-// setTimeout(함수, 시간)
-
-// Hi보다 Done!이 먼저 출력됨..
-// function timeout() {
-//   setTimeout(() => {
-//     console.log('Hi')
-//   }, 3000)
-// }
-// timeout()
-// console.log('Done!')
-
-function timeout(callback) {
-  setTimeout(() => {
-    console.log('Hi')
-    callback() // 특정한 실행 위치를 보장하기 위해 활용
-  }, 3000)
+class Vehicle { // 생성자함수 혹은 class
+  constructor(name, wheel) {
+    this.name = name
+    this.wheel = wheel
+  }
 }
-timeout(() => { // 콜백함수, 인수로사용
-  console.log('Done!')
-})
-*/
+const myVehicle = new Vehicle('운송수단', 2)
+console.log(myVehicle)
+
+class Bicycle extends Vehicle { // Vehicle을 확장(상속)
+  constructor(name, wheel) {
+    super(name, wheel) // super => 확장된 클래스
+  }
+}
+const myBicycle = new Bicycle('삼천리', 2)
+const daughtersBicycle = new Bicycle('세발', 3)
+console.log(myBicycle)
+console.log(daughtersBicycle)
+
+//진정한 의미의 확장, 추가적인 this도.. 활용
+class Car extends Vehicle {
+  constructor(name, wheel, license) {
+    super(name, wheel)
+    this.license = license
+  }
+}
+const myCar = new Car('벤츠', 4, true)
+const daughtersCar = new Car('포르쉐', 4, false)
+
+console.log(myCar)
+console.log(daughtersCar)
