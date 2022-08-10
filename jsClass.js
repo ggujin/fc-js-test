@@ -174,7 +174,7 @@ console.log(neo.getFullName())
 
 
 
-/* 상속(확장) */
+/* 상속(확장) 
 
 class Vehicle { // 생성자함수 혹은 class
   constructor(name, wheel) {
@@ -207,3 +207,4 @@ const daughtersCar = new Car('포르쉐', 4, false)
 
 console.log(myCar)
 console.log(daughtersCar)
+*/
